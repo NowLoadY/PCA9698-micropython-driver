@@ -41,11 +41,18 @@ pca_1 = PCA9698.PCA9698(iic=i2c, address=0x20)  # Create an instance of PCA9698 
 #pca_3 = PCA9698.PCA9698(iic=i2c, address=0x22)
 pcas = [pca_1]#[pca_1, pca_2, pca_3]
 for pca_num, pca in enumerate(pcas):
+    print(f"Set all ports to mode 'input'")
+    pca.set_ports_mode([0,0,0,0,0])  # Set all ports of PCA9698 to output mode
+    pca.update_all()
+    for port_num in range(5):
+        mode_dict = {0x00: "output", 0xFF: "input"}
+        print(f"pca_{pca_num}:port {port_num} mode: {mode_dict.get(pca.read_port_mode(port_num), 'unknown')}")
+    print(f"Set all ports to mode 'output'")
     pca.set_ports_mode([1,1,1,1,1])  # Set all ports of PCA9698 to output mode
     pca.update_all()
     for port_num in range(5):
-        print(f"port {port_num} mode:", pca.read_port_mode(port_num))
-    print("Configured pca9698:", hex(pca.address))  # Print the address of the connected PCA9698
+        mode_dict = {0x00: "output", 0xFF: "input"}
+        print(f"pca_{pca_num}:port {port_num} mode: {mode_dict.get(pca.read_port_mode(port_num), 'unknown')}")
 #pca_1.set_port_mode(port_num=0, mode=1)
 #pca_1.set_port_mode(port_num=1, mode=1)
 #pca_1.set_port_mode(port_num=2, mode=1)
@@ -54,7 +61,7 @@ for pca_num, pca in enumerate(pcas):
 time.sleep(0.5)  # Delay for 0.5 seconds
 
 for pca_num, pca in enumerate(pcas):
-    print(f"pca9698_{pca_num}:drive on")  # Indicate that driving the pins is starting
+    print(f"pca_{pca_num}:drive on")  # Indicate that driving the pins is starting
     for pin_num in range(40):
         pca.write_pin(pin_num, 1)  # Set each pin to high
         print(f"pca_{pca_num}: pin:{pin_num}", "read again:", pca.read_pin(pin_num))  # Print the pin number and read back its status
@@ -62,7 +69,7 @@ for pca_num, pca in enumerate(pcas):
         #print(f"pca_{pca_num}: pin:{pin_num}", "new_status:", new_status, "read again:", pca.read_pin(pin_num))
 
     time.sleep(1)  # Delay for 1 second
-    print(f"pca9698_{pca_num}:drive off")  # Indicate that driving the pins is stopping
+    print(f"pca_{pca_num}:drive off")  # Indicate that driving the pins is stopping
     for pin_num in range(40):
         pca.write_pin(pin_num, 0)  # Set each pin to low
         print(f"pca_{pca_num}: pin:{pin_num}", "read again:", pca.read_pin(pin_num))  # Print the pin number and read back its status
@@ -111,7 +118,7 @@ for pca_num, pca in enumerate(pcas):
         print(f"pca_{pca_num}:Some pins may have issues with interrupt functionality, please check hardware or configuration")
 
     # Disable all interrupts
-    print("Disabling interrupts")
+    print(f"pca_{pca_num}: Disabling interrupts")
     for pin_num in range(40):
         pca.set_interrupt(pin=pin_num, enable=0)
     print(f"pca_{pca_num}:Interrupts disabled for all pins")
