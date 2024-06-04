@@ -82,7 +82,7 @@ class PCA9698:
             raise ValueError("Modes array must contain exactly 5 elements.")
         for port_num, mode in enumerate(modes):
             self.set_port_mode(port_num, mode)
-            print(f"Set port {port_num} to mode {mode}")
+            #print(f"Set port {port_num} to mode {mode}")
 
     def read_port(self, port_num):
         if port_num >= 5:
